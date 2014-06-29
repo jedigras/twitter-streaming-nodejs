@@ -8,10 +8,10 @@ var twitter = require('twitter'),
 
 //Setup twitter stream api
 var twit = new twitter({
-  consumer_key: '<ENTER>',
-  consumer_secret: '<ENTER>',
-  access_token_key: '<ENTER>',
-  access_token_secret: '<ENTER>'
+  consumer_key: 'JceXz7EqUnhfYmQWcTdssZ1Pw',
+  consumer_secret: 'Uu8op6TFBAg7Lv0gDEcMn4K6wqgzg4Y4fZhPdUePE9oVRPkViM',
+  access_token_key: '21738909-XguXAbLLMARsiBFaDR3DmJNNMfX2BwJ8DSbGCL1aG',
+  access_token_secret: 'OrlJfOiEAIQrLraXbLvcpf2eq2LMaz0exTdheEVl7eDY4'
 }),
 stream = null;
 
@@ -28,11 +28,53 @@ io.sockets.on('connection', function (socket) {
 
     if(stream === null) {
       //Connect to twitter stream passing in filter for entire world.
-      twit.stream('statuses/filter', {'locations':'-180,-90,180,90'}, function(stream) {
+
+//twit.stream('statuses/filter', { track: ['food','poisoning'] }, 
+//	function(stream) { stream.on('data', 
+//		function (data) { console.log(data.text); }); });
+
+      twit.stream('statuses/filter', {
+//location of the world
+		'locations':'-180,-90,180,90'
+//location of the usa
+//		'locations':'-124.848974, 24.39630,-66.885444, 49.384358'
+		}, function(stream) {
           stream.on('data', function(data) {
               // Does the JSON result have coordinates
+
+var s1 = "food poisoning";
+var s2 = "ecoli";
+var s3 = "salmonella";
+var s4 = "ate something bad";
+var s5 = "stomach";
+var s6 = "belly hurts";
+var s7 = "foodtech";
+var s8 = "bad food";
+var s9 = "restaurant inspection";
+var s10 = "food safety";
+var s11 = "inspection grade";
+var s12 = "unsafe food";
+if (data.text) {
+	if ((data.text.indexOf(s1) > -1) || 
+	(data.text.indexOf(s2) > -1) || 
+	(data.text.indexOf(s3) > -1) ||  
+	(data.text.indexOf(s4) > -1) ||  
+	(data.text.indexOf(s5) > -1) ||
+	(data.text.indexOf(s6) > -1) ||  
+	(data.text.indexOf(s7) > -1) ||  
+	(data.text.indexOf(s8) > -1) ||  
+	(data.text.indexOf(s9) > -1) ||  
+	(data.text.indexOf(s10) > -1) ||  
+	(data.text.indexOf(s11) > -1) ||  
+	(data.text.indexOf(s12) > -1)) {
+
               if (data.coordinates){
                 if (data.coordinates !== null){
+
+
+	console.log(data.coordinates.coordinates[0] + ',' +data.coordinates.coordinates[1]+ ' ' + data.text );
+
+
                   //If so then build up some nice json and send out to web sockets
                   var outputPoint = {"lat": data.coordinates.coordinates[0],"lng": data.coordinates.coordinates[1]};
 
@@ -59,10 +101,12 @@ io.sockets.on('connection', function (socket) {
                     // Build json object and broadcast it
                     var outputPoint = {"lat": centerLat,"lng": centerLng};
                     socket.broadcast.emit("twitter-stream", outputPoint);
-
                   }
                 }
               }
+	}
+}
+
               stream.on('limit', function(limitMessage) {
                 return console.log(limitMessage);
               });
